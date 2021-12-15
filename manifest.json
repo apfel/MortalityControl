@@ -1,0 +1,7 @@
+{
+    "name": "MortalityControl",
+    "description": "Force-disables immortality in BONEWORKS.",
+    "version_number": "1.0.0",
+    "dependencies": [ "gnonme-ModThatIsNotMod-0.2.5" ],
+    "website_url": "https://github.com/apfel/MortalityControl"
+}
