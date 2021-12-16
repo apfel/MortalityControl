@@ -1,7 +1,7 @@
 {
     "name": "MortalityControl",
     "description": "Allows toggling mortality in BONEWORKS.",
-    "version_number": "1.1.0",
+    "version_number": "2.0.0",
     "dependencies": [ "gnonme-ModThatIsNotMod-0.2.5" ],
     "website_url": "https://github.com/apfel/MortalityControl"
 }

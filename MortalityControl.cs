@@ -23,40 +23,10 @@ using UnityEngine;
 
 public class MortalityControl : MelonMod
 {
-    private bool beMortal = false;
+    private bool beMortal = true;
+    private bool preferInstantDeath = true;
 
-    public override void OnApplicationStart()
-    {
-        MelonPreferences_Category prefCategory = MelonPreferences.CreateCategory("MortalityControl", "Mortality Control");
-
-        MelonPreferences_Entry<bool> mortalityEntry = prefCategory.CreateEntry<bool>("ToggleMortality", false, "Toggle mortality", "Whether to mortal-ize the player.");
-        beMortal                                    = mortalityEntry.Value;
-        mortalityEntry.OnValueChanged               += (_, _new) =>
-        {
-            beMortal = _new;
-
-            GameObject _object = GameObject.Find("[RigManager (Default Brett)]");
-            if (_object == null)
-            {
-                LoggerInstance.Warning("Failed to find the rig manager.");
-                return;
-            }
-
-            Player_Health health = _object.GetComponent<Player_Health>();
-            if (health == null)
-            {
-                LoggerInstance.Warning("Failed to find the health component.");
-                return;
-            }
-
-            health.healthMode = _new ? Player_Health.HealthMode.Mortal :  Player_Health.HealthMode.Invincible;
-        };
-
-        MenuCategory category = ModThatIsNotMod.BoneMenu.MenuManager.CreateCategory("Mortality Control", Color.white);
-        category.CreateBoolElement("Disable immortality", Color.white, beMortal, (_new) => beMortal = _new);
-    }
-
-    public override void OnSceneWasInitialized(int buildIndex, string sceneName)
+    private void performHealthTypeChange()
     {
         GameObject _object = GameObject.Find("[RigManager (Default Brett)]");
         if (_object == null)
@@ -72,6 +42,37 @@ public class MortalityControl : MelonMod
             return;
         }
 
-        health.healthMode = beMortal ? Player_Health.HealthMode.Mortal : Player_Health.HealthMode.Invincible;
+        health.healthMode = !beMortal ? Player_Health.HealthMode.Invincible : preferInstantDeath ? Player_Health.HealthMode.InsantDeath : Player_Health.HealthMode.Mortal;
     }
+
+    private void updateBeMortal(bool yes)
+    {
+        beMortal = yes;
+        performHealthTypeChange();
+    }
+
+    private void updatePreferInstantDeath(bool yes)
+    {
+        preferInstantDeath = yes;
+        performHealthTypeChange();
+    }
+
+    public override void OnApplicationStart()
+    {
+        MelonPreferences_Category prefCategory = MelonPreferences.CreateCategory("MortalityControl", "Mortality Control");
+
+        MelonPreferences_Entry<bool> mortalityEntry = prefCategory.CreateEntry<bool>("ToggleMortality", true, "Toggle mortality", "Whether to mortal-ize the player.");
+        beMortal                                    = mortalityEntry.Value;
+        mortalityEntry.OnValueChanged               += (_, _new) => updateBeMortal(_new);
+
+        MelonPreferences_Entry<bool> instantDeathPreference = prefCategory.CreateEntry<bool>("PreferInstantDeath", preferInstantDeath, "Prefer instant death", "Whether the player should die instantly instead of having time for revenge.");
+        preferInstantDeath                                  = instantDeathPreference.Value;
+        instantDeathPreference.OnValueChanged               += (_, _new) => updatePreferInstantDeath(_new);
+
+        MenuCategory category = ModThatIsNotMod.BoneMenu.MenuManager.CreateCategory("Mortality Control", Color.white);
+        category.CreateBoolElement("Become mortal", Color.white, beMortal, (_new) => updateBeMortal(_new));
+        category.CreateBoolElement("Prefer instant death", Color.white, beMortal, (_new) => updatePreferInstantDeath(_new));
+    }
+
+    public override void OnSceneWasInitialized(int buildIndex, string sceneName) => performHealthTypeChange();
 }

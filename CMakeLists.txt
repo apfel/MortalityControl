@@ -18,7 +18,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.10.0)
-project(MortalityControl LANGUAGES CSharp VERSION 1.1.0)
+project(MortalityControl LANGUAGES CSharp VERSION 2.0.0)
 
 set(BONEWORKS_DIR "C:\\Program Files (x86)\\Steam\\steamapps\\common\\BONEWORKS")
 
